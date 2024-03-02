@@ -41,9 +41,16 @@ export default function Page() {
   }
 
   const ResultPage = (input: {result: string|undefined}) => {
-    console.log(`res: ${input.result}`)
     if(input.result) 
-      return <div><div className = {styles.success}>Success! Here is your short URL:</div><div><a target="_blank" href={fetchedResults}>{fetchedResults}</a></div></div>
+      return (
+      <div>
+          <div className = {styles.success}>Success! Here is your short URL:</div>
+          <div>
+            <a target="_blank" href={fetchedResults}>{fetchedResults}
+          </a>
+          <button className="hover:bg-blue-300 bg-blue-400 focus:outline-none text-white font-bold py-1 px-4 ml-2 rounded border-solid border-2" onClick = {copyToClipboard}>Copy</button>
+        </div>
+      </div>)
     else 
       return <div></div>;
   }
@@ -65,12 +72,17 @@ export default function Page() {
       .then(response => {
         if(response.status !== 200)
           throw new Error(response.statusText);
-        return response.json() as any as {shortenedUrl: string};
+        return response.json();
       })
       .then(result  => {
-        const resultUrl = `${SERVER_PROTOCOL}://${SERVER_HOST}:${SERVER_PORT}/${result.shortenedUrl}`
-        setFetchedResults(resultUrl);
-        console.log(resultUrl);
+        const slug = result.data[0]?.attributes?.slug;
+        if(!slug) {
+          setError(`Server returned unexpeted JSONAPi results`)
+        } else {
+          const resultUrl = `${SERVER_PROTOCOL}://${SERVER_HOST}:${SERVER_PORT}/${slug}`
+          setFetchedResults(resultUrl);
+          console.log(resultUrl);
+        }
       })
       .catch(err => {
         setFetchedResults("");
@@ -78,7 +90,11 @@ export default function Page() {
         console.log(`error ${JSON.stringify(err, null, 2)}`)});
   }
 
-
+  const copyToClipboard = () => {
+    // alert('click');
+    navigator.clipboard.writeText(fetchedResults)
+  }
+  
   return (
     <div className = "grid grid-cols-1">
         <div>
@@ -99,7 +115,7 @@ export default function Page() {
         </div>
         <div className="md:flex md:items-center">
           <div className="md:w-3/3">
-            <button onClick={submitShortenRequest} disabled={isButtonDisabled} className="shadow bg-purple-500 hover:bg-purple-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded" type="button">
+            <button onClick={submitShortenRequest} disabled={isButtonDisabled} className="hover:bg-blue-300 bg-blue-400 focus:outline-none text-white font-bold py-1 px-4 rounded border-solid border-2" type="button">
               Shorten
             </button>
           </div>
@@ -111,38 +127,5 @@ export default function Page() {
     <ErrorPage/>
     </div>
   )
-  /*
-  return (
-
-    
-    <div className="md:flex md:items-center">
-        <form className="w-full max-w-sm">
-          <div className="md:flex md:items-center mb-6">
-            <div className="md:w-1/3">
-              <label className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4" >
-              Enter a URL to shorten:
-            </label>  
-          </div>
-          <div className="md:w-2/3">
-            <input className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500" 
-            id="url" 
-            placeholder="enter url here"
-            onChange={handleURLChange} />
-          </div>
-      </div>
-      <div className="md:flex md:items-center">
-        <div className="md:w-1/3"></div>
-          <div className="md:w-2/3">
-            <button onClick={submitURL} disabled={isButtonDisabled} className="shadow bg-purple-500 hover:bg-purple-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded" type="button">
-            Shorten
-            </button>
-          </div>
-        </div>
-      </form>
-      <div className="md:flex md:items-center">
-        Hello
-      </div>
-    </div>
-    );
-*/
+  
  }
