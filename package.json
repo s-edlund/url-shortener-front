@@ -1,9 +1,10 @@
 {
   "private": true,
   "scripts": {
-    "build": "next build",
+    "build": "BUILD_PATH='./dist' next build",
     "dev": "next dev",
-    "start": "next start"
+    "start": "next start",
+    "prod": "next export" 
   },
   "dependencies": {
     "@tailwindcss/forms": "^0.5.7",
