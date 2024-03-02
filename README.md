@@ -10,4 +10,6 @@
 * `./run-docker.sh`
 * Make sure the nginx container comes up okay (`docker logs  url-shortener-front`). If not, you might need to change the port in `run-docker.sh` to use a different host port than 80 (it might be taken up by a different service)
 * Load up `http://localhost` in a browser. The React app should show up.
-sds
+
+
+You can also run a local dev version of the app using `npm start dev`

@@ -48,7 +48,7 @@ export default function Page() {
       <div>
           <div className = {styles.success}>Success! Here is your short URL:</div>
           <div>
-            <a target="_blank" href={fetchedResults}>{fetchedResults}
+            <a target="_blank" href={fetchedResults} className={styles.urllink}>{fetchedResults}
           </a>
           <button className="hover:bg-blue-300 bg-blue-400 focus:outline-none text-white font-bold py-1 px-4 ml-2 rounded border-solid border-2" onClick = {copyToClipboard}>Copy</button>
         </div>
@@ -65,10 +65,12 @@ export default function Page() {
       return <div></div>;
   }
 
-  const submitShortenRequest = () => {
+  const submitShortenRequest = (e) => {
 
     // const urlWithoutProtocol = urlUtils.getUrlWithoutProtocol(getUrl);
 
+    e.preventDefault();
+    
     const fetchUrl = `${SERVER_PROTOCOL}://${SERVER_HOST}:${SERVER_PORT}/${SERVER_SHORTENER_ENDPOINT}?${SHORTENING_QUERY_PARAM}=${getUrl}`;
     fetch(fetchUrl)
       .then(response => {
@@ -101,7 +103,7 @@ export default function Page() {
     <div className = "grid grid-cols-1">
         <div>
         <div className="md:flex">
-          <form className="w-full max-w-lg">
+          <form className="w-full max-w-lg" onSubmit={submitShortenRequest} >
             <div className="md:flex md:items-center mb-6">
               <div className="md:w-1/3">
                 <label className="block text-gray-500 font-bold mb-1 md:mb-0 pr-4" >
@@ -117,7 +119,7 @@ export default function Page() {
         </div>
         <div className="md:flex md:items-center">
           <div className="md:w-3/3">
-            <button onClick={submitShortenRequest} disabled={isButtonDisabled} className="hover:bg-blue-300 bg-blue-400 focus:outline-none text-white font-bold py-1 px-4 rounded border-solid border-2" type="button">
+            <button disabled={isButtonDisabled} className="hover:bg-blue-300 bg-blue-400 focus:outline-none text-white font-bold py-1 px-4 rounded border-solid border-2" type="submit">
               Shorten
             </button>
           </div>
