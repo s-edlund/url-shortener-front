@@ -3,6 +3,7 @@ export type UrlRec = {
    url: string,
    id: number,
    user: string;
+   visits?: number;
 }
 
 export type JSONApiResult = {

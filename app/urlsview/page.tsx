@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { URLUtils } from '../utils/url-utils';
 import { SERVER_HOST, SERVER_PORT, SERVER_PROTOCOL, SERVER_SHORTENER_ENDPOINT, SERVER_UPDATE_SLUG_ENDPOINT, SERVER_URLFETCH_ENDPOINT, SHORTENING_QUERY_PARAM } from '../config/config';
 import { JSONApiResult, UrlRec } from '../model/model';
+import styles from '@/app/urlsview/urlsview.module.css';
 
 const urlUtils = new URLUtils();
 
@@ -32,7 +33,8 @@ export default function Page(props: {user: string}) {
             slug: d.attributes.slug,
             url: d.attributes.url,
             id: d.attributes.id,
-            user: d.attributes.user};});
+            user: d.attributes.user,
+            visits: d.attributes.visits};});
 
         setUrls(newUrls);
       })
@@ -102,8 +104,8 @@ export default function Page(props: {user: string}) {
   const getUrlRowContent = (url: UrlRec) => {
     return (<React.Fragment key={url.id}>
       <div>{url.url}</div>
-      <div>{url.slug}</div>
-      <div>{url.id}</div>
+      <div><a target="_blank" className={styles.urllink} href={SERVER_PROTOCOL+"://"+SERVER_HOST+":"+SERVER_PORT+"/"+url.slug}> {SERVER_PROTOCOL+"://"+SERVER_HOST+":"+SERVER_PORT+"/"+url.slug}</a></div>
+      <div>{url.visits}</div>
       <div><form onSubmit={()=>renameSlug(event, url)}><input type="text" required minLength={1} maxLength={100} size={20} onChange={()=>slugNameChange(event, url)} className="p-1" ></input><button type="submit" className="hover:bg-blue-300 bg-blue-400 focus:outline-none text-white font-bold py-1 px-4 rounded border-solid border-2">Rename</button></form></div>
       </React.Fragment>)
   }
@@ -116,7 +118,7 @@ export default function Page(props: {user: string}) {
       <div className = "grid grid-cols-4 border-solid border-2 ">
         <div className="font-bold">URL</div>
         <div className="font-bold">Slug</div>
-        <div className="font-bold">ID</div>
+        <div className="font-bold">Visits</div>
         <div className="font-bold">Rename</div>
         
         {getUrls.map(url => getUrlRowContent(url))}
