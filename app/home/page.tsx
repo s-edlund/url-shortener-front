@@ -1,27 +1,29 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from '@/app/home/home.module.css';
 import { URLUtils } from '../utils/url-utils';
-
-// Should come from config, e.g. configmap in k8s.
-const SERVER_PROTOCOL = "http";
-const SERVER_HOST = "localhost";
-const SERVER_PORT = "3001";
-const SERVER_SHORTENER_ENDPOINT= "shorten";
-const SHORTENING_QUERY_PARAM = 'url';
+import { useSearchParams } from 'next/navigation';
+import URLViewsPage from '@/app/urlsview/page';
+import PandaPage from '@/app/panda/page';
+import { SERVER_HOST, SERVER_PORT, SERVER_PROTOCOL, SERVER_SHORTENER_ENDPOINT, SHORTENING_QUERY_PARAM } from '../config/config';
+import { JSONApiResult } from '../model/model';
 
 const urlUtils = new URLUtils();
 
-<div className={styles.shape} />;
 
 export default function Page() {
 
   // Url to shorten
   const [getUrl, setURL] = useState("");
-  const [isButtonDisabled, setButtonDisabled] = useState(false);
+  const [isButtonDisabled, setButtonDisabled] = useState(true);
   const [fetchedResults, setFetchedResults] = useState("");
   const [getError, setError] =  useState("");
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const user = (searchParams && searchParams.length == 2 && searchParams[0] == 'user')? searchParams[1] : 'dummyUser'
+
+  console.log(`user is ${user} p: ${searchParams}`);
 
   const handleURLChange = (val: any) => {
     let url = val.target.value.trim();
@@ -65,18 +67,15 @@ export default function Page() {
       return <div></div>;
   }
 
-  const submitShortenRequest = (e) => {
-
-    // const urlWithoutProtocol = urlUtils.getUrlWithoutProtocol(getUrl);
-
+  const submitShortenRequest = (e:any) => {
     e.preventDefault();
-    
-    const fetchUrl = `${SERVER_PROTOCOL}://${SERVER_HOST}:${SERVER_PORT}/${SERVER_SHORTENER_ENDPOINT}?${SHORTENING_QUERY_PARAM}=${getUrl}`;
+
+    const fetchUrl = `${SERVER_PROTOCOL}://${SERVER_HOST}:${SERVER_PORT}/${SERVER_SHORTENER_ENDPOINT}?${SHORTENING_QUERY_PARAM}=${getUrl}&user=${user}`;
     fetch(fetchUrl)
       .then(response => {
         if(response.status !== 200)
           throw new Error(response.statusText);
-        return response.json();
+        return response.json() as unknown as JSONApiResult;
       })
       .then(result  => {
         const slug = result.data[0]?.attributes?.slug;
@@ -95,12 +94,12 @@ export default function Page() {
   }
 
   const copyToClipboard = () => {
-    // alert('click');
     navigator.clipboard.writeText(fetchedResults)
   }
   
   return (
     <div className = "grid grid-cols-1">
+        <PandaPage/>
         <div>
         <div className="md:flex">
           <form className="w-full max-w-lg" onSubmit={submitShortenRequest} >
@@ -119,7 +118,7 @@ export default function Page() {
         </div>
         <div className="md:flex md:items-center">
           <div className="md:w-3/3">
-            <button disabled={isButtonDisabled} className="hover:bg-blue-300 bg-blue-400 focus:outline-none text-white font-bold py-1 px-4 rounded border-solid border-2" type="submit">
+            <button disabled={isButtonDisabled} className="disabled:bg-blue-100 hover:bg-blue-300 bg-blue-400 focus:outline-none text-white font-bold py-1 px-4 rounded border-solid border-2" type="submit">
               Shorten
             </button>
           </div>
@@ -127,8 +126,11 @@ export default function Page() {
         </form>
       </div>
     </div>
-    <ResultPage result={fetchedResults}/>
     <ErrorPage/>
+    <ResultPage result={fetchedResults}/>
+    <div className='mt-2'>
+      <URLViewsPage user={user}/>
+    </div>  
     </div>
   )
   
