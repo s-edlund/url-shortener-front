@@ -5,13 +5,16 @@ import { URLUtils } from '../utils/url-utils';
 import { SERVER_HOST, SERVER_PORT, SERVER_PROTOCOL, SERVER_SHORTENER_ENDPOINT, SERVER_UPDATE_SLUG_ENDPOINT, SERVER_URLFETCH_ENDPOINT, SHORTENING_QUERY_PARAM } from '../config/config';
 import { JSONApiResult, UrlRec } from '../model/model';
 import styles from '@/app/urlsview/urlsview.module.css';
+import { useSearchParams } from 'next/navigation';
 
 const urlUtils = new URLUtils();
 
-export default function Page(props: {user: string}) {
+export default function Page() {
 
-  const user = props?.user;
-  console.log(`user is ${user}`)
+  const [searchParams, setSearchParams] = useSearchParams();
+  const user = (searchParams && searchParams.length == 2 && searchParams[0] == 'user')? searchParams[1] : 'dummyUser'
+
+  console.log(`user is ${user} p: ${searchParams}`);
 
 
   const [getUrls, setUrls] = useState([] as UrlRec[]);

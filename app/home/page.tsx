@@ -129,7 +129,7 @@ export default function Page() {
     <ErrorPage/>
     <ResultPage result={fetchedResults}/>
     <div className='mt-2'>
-      <URLViewsPage user={user}/>
+      <URLViewsPage/>
     </div>  
     </div>
   )
